@@ -6,7 +6,7 @@ pipeline {
         DOCKER_BUILD_TAG = "v${env.BUILD_NUMBER}"
         DOCKER_PWD = credentials('dockerhub')
         GIT_CREDENTIALS = credentials('github_access')
-        REPO_URL = 'gongbu22/project-parking-CD-yj.git'
+        REPO_URL = 'gongbu22/project-parking-CD.git'
         COMMIT_MESSAGE = 'Update README.md via Jenkins Pipeline'
     }
 
@@ -14,15 +14,15 @@ pipeline {
         stage('clone from SCM') {
             steps {
                 sh '''
-                rm -rf project-parking-yj
-                git clone https://github.com/gongbu22/project-parking-yj.git
+                rm -rf project-parking
+                git clone https://github.com/gongbu22/project-parking.git
                 '''
             }
         }
 
         stage('Docker Image Building') {
             steps {
-                dir('project-parking-yj'){
+                dir('project-parking'){
                 sh '''
                 docker build -t ${DOCKER_IMAGE_OWNER}/msa-frontend-nginx:latest -t ${DOCKER_IMAGE_OWNER}/msa-frontend-nginx:${DOCKER_BUILD_TAG} -f ./msa-frontend/nginx-Dockerfile ./msa-frontend
                 docker tag ${DOCKER_IMAGE_OWNER}/msa-frontend-nginx:latest ${DOCKER_IMAGE_OWNER}/msa-frontend-nginx:${DOCKER_BUILD_TAG}
@@ -78,7 +78,7 @@ pipeline {
         stage('Clone Repository') {
             steps {
                 sh '''
-                rm -rf project-parking-CD-yj
+                rm -rf project-parking-CD
                 git clone https://github.com/${REPO_URL}
                 '''
             }
@@ -87,7 +87,7 @@ pipeline {
         stage('Modify README.md') {
             steps {
                 sh """
-                    cd project-parking-CD-yj
+                    cd project-parking-CD
                     echo "# Updated README" > README.md
                     echo "This README was updated by Jenkins Build #${env.BUILD_NUMBER} on \$(date)" >> README.md
                 """
@@ -96,7 +96,7 @@ pipeline {
 
         stage('Commit Changes') {
             steps {
-                dir('hello-msa-cd') {
+                dir('project-parking-CD') {
                 sh '''
                     git config user.name "gongbu22"
                     git config user.email "pyujin0711@naver.com"
@@ -109,7 +109,7 @@ pipeline {
 
         stage('Push Changes') {
             steps {
-                dir('hello-msa-cd') {
+                dir('project-parking-CD') {
                 sh '''
                     git push https://${GIT_CREDENTIALS_USR}:${GIT_CREDENTIALS_PSW}@github.com/${REPO_URL} main
                 '''
